@@ -3,11 +3,9 @@
  */
 package hotel.aplicacion;
 
-import hotel.modelo.Cliente;
-import hotel.modelo.Reserva;
-import hotel.modelo.TipoHabitacion;
-import hotel.utilidades.Utilidades;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
@@ -43,31 +41,7 @@ public class Hotel {
 			case 1:
 				// Opción para crear clientes
 				try {
-					String nombre;
-					do {
-						System.out.println("\nIntroduzca los datos del cliente:");
-						System.out.print("Nombre: ");
-						nombre = sc.nextLine();
-					} while(nombre.isEmpty());
-					
-					String dni=null;
-					boolean dniValido;
-					do {
-						try {
-							System.out.print("Introduzca DNI: ");
-							dni = sc.nextLine();
-							Utilidades.validarDNI(dni);
-							dniValido=true;
-						} catch (Exception e) {
-							System.out.println(e.getMessage());
-							dniValido=false;
-						}
-					} while (!dniValido);
-					System.out.print("Teléfono: ");
-					String telefono = sc.nextLine();
-					// Se crea el primer cliente con datos ingresados por el usuario.
-					cliente1 = new Cliente(nombre, dni, telefono);
-					System.out.println("Cliente creado correctamente:\n" + cliente1.mostrarInformacion());
+					cliente1 = altaCliente(sc);
 					
 					// Creación de dos clientes adicionales con datos literales.
 					cliente2 = new Cliente("Ana García", "12345678Z", "600111222");
@@ -100,7 +74,20 @@ public class Hotel {
 				LocalDate fechaEntrada = null;
 				boolean fechaEntradaValida = false;
 				while (!fechaEntradaValida) {
-					fechaEntrada = Utilidades.leerFecha("Introduzca la fecha de entrada");
+					Scanner sc1 = new Scanner(System.in);
+					LocalDate fecha = null;
+					boolean fechaValida = false;
+					while (!fechaValida) {
+					    try {
+					        System.out.print("Introduzca la fecha de entrada" + " (formato yyyy-MM-dd): ");
+					        String input = sc1.nextLine();
+					        fecha = LocalDate.parse(input, DateTimeFormatter.ISO_LOCAL_DATE);
+					        fechaValida = true;
+					    } catch (DateTimeParseException e) {
+					        System.out.println("Fecha inválida. Por favor, introduzca la fecha en formato yyyy-MM-dd.");
+					    }
+					}
+					fechaEntrada = fecha;
 					LocalDate hoy = LocalDate.now();
 					if (fechaEntrada.isBefore(hoy)) {
 						System.out.println(
@@ -113,7 +100,20 @@ public class Hotel {
 				LocalDate fechaSalida = null;
 				boolean fechaSalidaValida = false;
 				while (!fechaSalidaValida) {
-					fechaSalida = Utilidades.leerFecha("Introduzca la fecha de salida");
+					Scanner sc1 = new Scanner(System.in);
+					LocalDate fecha = null;
+					boolean fechaValida = false;
+					while (!fechaValida) {
+					    try {
+					        System.out.print("Introduzca la fecha de salida" + " (formato yyyy-MM-dd): ");
+					        String input = sc1.nextLine();
+					        fecha = LocalDate.parse(input, DateTimeFormatter.ISO_LOCAL_DATE);
+					        fechaValida = true;
+					    } catch (DateTimeParseException e1) {
+					        System.out.println("Fecha inválida. Por favor, introduzca la fecha en formato yyyy-MM-dd.");
+					    }
+					}
+					fechaSalida = fecha;
 					try {
 						Utilidades.validarFechas(fechaEntrada, fechaSalida);
 						fechaSalidaValida = true;
@@ -209,6 +209,36 @@ public class Hotel {
 		} while (opcion != 4);
 
 		sc.close();
+	}
+
+	private static Cliente altaCliente(Scanner sc) throws Exception {
+		Cliente cliente1;
+		String nombre;
+		do {
+			System.out.println("\nIntroduzca los datos del cliente:");
+			System.out.print("Nombre: ");
+			nombre = sc.nextLine();
+		} while(nombre.isEmpty());
+		
+		String dni=null;
+		boolean dniValido;
+		do {
+			try {
+				System.out.print("Introduzca DNI: ");
+				dni = sc.nextLine();
+				Utilidades.validarDNI(dni);
+				dniValido=true;
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				dniValido=false;
+			}
+		} while (!dniValido);
+		System.out.print("Teléfono: ");
+		String telefono = sc.nextLine();
+		// Se crea el primer cliente con datos ingresados por el usuario.
+		cliente1 = new Cliente(nombre, dni, telefono);
+		System.out.println("Cliente creado correctamente:\n" + cliente1.mostrarInformacion());
+		return cliente1;
 	}
 
 }

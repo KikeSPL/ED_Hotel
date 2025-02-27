@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package hotel.modelo;
+package hotel.aplicacion;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -13,30 +13,30 @@ import java.time.temporal.ChronoUnit;
  */
 public class Reserva {
     private static int contadorReservas = 0;
-    private int codigoreserva;
+    private int codigoReserva;
     private Cliente cliente;
     private LocalDate fechaEntrada;
     private LocalDate fechaSalida;
     private TipoHabitacion tipoHabitacion;
-    private boolean CamaSupletoria;
+    private boolean camaSupletoria;
     private double costeTotal;
     
     // Constantes fijas para el precio
-    private static final double PRECIODOBLE = 50.0;
-    private static final double PRECIOSUITE = 100.0;
-    private static final double RECARGOCAMASUPLETORIA = 20.0;
+    private static final double PRECIO_DOBLE = 50.0;
+    private static final double PRECIO_SUITE = 100.0;
+    private static final double RECARGO_CAMA_SUPLETORIA = 20.0;
 
        public Reserva(Cliente cliente, LocalDate fechaEntrada, LocalDate fechaSalida,
                    TipoHabitacion tipoHabitacion, boolean camaSupletoria) throws Exception {
         if (!fechaSalida.isAfter(fechaEntrada)) {
             throw new Exception("La fecha de salida debe ser posterior a la de entrada.");
         }
-        this.codigoreserva = obtenerCodigoReserva();
+        this.codigoReserva = obtenerCodigoReserva();
         this.cliente = cliente;
         this.fechaEntrada = fechaEntrada;
         this.fechaSalida = fechaSalida;
         this.tipoHabitacion = tipoHabitacion;
-        this.CamaSupletoria = camaSupletoria;
+        this.camaSupletoria = camaSupletoria;
         this.costeTotal = calcularCosteTotal();
     }
 
@@ -46,13 +46,24 @@ public class Reserva {
         return contadorReservas;
     }
 
-    
+    /**
+     * Calcula el coste total de la reserva teniendo en cuenta el numero de noches,
+     * el tipo de habitación y si ha solicitado cama supletoria. 
+     * 
+     * El cálculo se realiza de la siguiente forma:
+     *	- Se determina el nº de noches entre la fecha de entrada y salida
+     *	- Se asigna un precio por noche segun el tipo de habitacion
+     *	- Si la reserva incluye cama supletoria se incrementa el precio
+     *	- Si la duracion de la reserva es para mas de 7 noches se aplica descuento 
+     *
+     * @return El coste total de la reserva.    
+     */
     public double calcularCosteTotal() {
         long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
-        double precioNoche = (tipoHabitacion == TipoHabitacion.DOBLE) ? PRECIODOBLE : PRECIOSUITE;
+        double precioNoche = (tipoHabitacion == TipoHabitacion.DOBLE) ? PRECIO_DOBLE : PRECIO_SUITE;
         
-        if (CamaSupletoria) {
-            precioNoche += RECARGOCAMASUPLETORIA;
+        if (camaSupletoria) {
+            precioNoche += RECARGO_CAMA_SUPLETORIA;
         }
         double total = noches * precioNoche;
         if (noches > 7) {
@@ -61,20 +72,23 @@ public class Reserva {
         return total;
     }
 
-    
+    /**
+     * 
+     * @return Devuelve los detalles de la reserva
+     */
     public String mostrarDetalles() {
-        String detalles = "Código Reserva: " + codigoreserva + "\n" +
+        String detalles = "Código Reserva: " + codigoReserva + "\n" +
                           "Cliente: " + cliente.mostrarInformacion() + "\n" +
                           "Fecha de Entrada: " + fechaEntrada + "\n" +
                           "Fecha de Salida: " + fechaSalida + "\n" +
                           "Tipo de Habitación: " + tipoHabitacion + "\n" +
-                          "Cama Supletoria: " + (CamaSupletoria ? "Sí" : "No") + "\n" +
+                          "Cama Supletoria: " + (camaSupletoria ? "Sí" : "No") + "\n" +
                           "Coste Total: " + costeTotal + "Euros";
         return detalles;
     }
 
     public int getCodigoReserva() {
-        return codigoreserva;
+        return codigoReserva;
     }
 
     public Cliente getCliente() {
@@ -94,7 +108,7 @@ public class Reserva {
     }
 
     public boolean isCamaSupletoria() {
-        return CamaSupletoria;
+        return camaSupletoria;
     }
 
     public double getCosteTotal() {
